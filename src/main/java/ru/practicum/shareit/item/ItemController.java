@@ -54,6 +54,6 @@ public class ItemController {
     public List<ItemDto> searchItems(@RequestHeader("X-Sharer-User-Id") int userId, @RequestParam String text) {
         log.info("GET: search text " + text);
 
-        return text != "" ? itemService.searchItems(userId, text) : new ArrayList<>();
+        return text.equals("") ? new ArrayList<>() : itemService.searchItems(userId, text);
     }
 }
