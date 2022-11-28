@@ -21,7 +21,7 @@ public interface ItemService {
 
     Boolean isItemAvailable(long itemId);
 
-    boolean isItemOwner(long ItemId, int userId);
+    boolean isItemOwner(long itemId, int userId);
 
     CommentDto addNewComment(int userId, long itemId, CommentDto dto);
 }

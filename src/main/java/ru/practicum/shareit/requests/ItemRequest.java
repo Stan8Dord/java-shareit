@@ -4,7 +4,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 
 import javax.persistence.*;
-import java.time.Instant;
 
 @Data
 @AllArgsConstructor
@@ -18,5 +17,4 @@ public class ItemRequest {
     private String description;
     @Column(name = "requester_id")
     private int requester;
-    //private Instant created;
 }

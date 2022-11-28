@@ -5,7 +5,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.dto.BookingMapper;
-import ru.practicum.shareit.booking.dto.BookingStatusDto;
 import ru.practicum.shareit.exceptions.NotFoundException;
 import ru.practicum.shareit.exceptions.ValidationException;
 import ru.practicum.shareit.item.ItemService;
@@ -50,7 +49,7 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public BookingDto replyBooking(long bookingId, int ownerId, Boolean approved){
+    public BookingDto replyBooking(long bookingId, int ownerId, Boolean approved) {
         Booking booking = checkBooking(bookingId);
         checkItemOwner(booking, ownerId);
         checkApproved(booking.getStatus());
@@ -65,7 +64,7 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public BookingDto getBooking(long bookingId, int userId){
+    public BookingDto getBooking(long bookingId, int userId) {
         Booking booking = checkBooking(bookingId);
         checkBookingOrItemOwner(booking, userId);
 
@@ -74,10 +73,10 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<BookingDto> getAllUserBookings(int userId, BookingState state){
+    public List<BookingDto> getAllUserBookings(int userId, BookingState state) {
         userService.checkUserId(userId);
         List<Booking> bookings = null;
-        switch(state) {
+        switch (state) {
             case ALL:
                 bookings = bookingRepository.findByBookerOrderByStartDesc(userId);
                 break;
@@ -102,7 +101,7 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<BookingDto> getAllUserStuffBookings(int ownerId, BookingState state){
+    public List<BookingDto> getAllUserStuffBookings(int ownerId, BookingState state) {
         userService.checkUserId(ownerId);
         List<Booking> bookings = bookingRepository.getBookingsByUserItemsWithState(ownerId, state);
         return bookings.stream().map(booking -> createBookingDto(booking.getBooker(), booking))

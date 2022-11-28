@@ -1,7 +1,6 @@
 package ru.practicum.shareit.exceptions;
 
 import lombok.Getter;
-import org.aspectj.lang.annotation.DeclareError;
 import org.springframework.core.convert.ConversionFailedException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -34,6 +33,7 @@ public class ErrorHandler {
     public ErrorResponse handleEnumRequestErrors(final ConversionFailedException e) {
         return new ErrorResponse("Unknown state: UNSUPPORTED_STATUS", e.getMessage());
     }
+
     @Getter
     class ErrorResponse {
         String error;
