@@ -146,10 +146,8 @@ public class ItemServiceImpl implements ItemService {
     @Override
     public boolean isItemOwner(long itemId, int userId) {
         checkItemId(itemId);
-        if (itemRepository.findById(itemId).get().getOwner() == userId)
-            return true;
-        else
-            return false;
+
+        return itemRepository.findById(itemId).get().getOwner() == userId;
     }
 
     @Override

@@ -86,10 +86,6 @@ public class UserServiceImpl implements UserService {
         return userRepository.findAll().stream().anyMatch(user -> user.getId() == userId);
     }
 
-    private boolean isEmailExists(String email) {
-        return userRepository.findAll().stream().anyMatch(u -> u.getEmail().equals(email));
-    }
-
     @Override
     public void deleteUser(int userId) {
         if (isUserExists(userId))
