@@ -1,6 +1,7 @@
 package ru.practicum.shareit.user;
 
 import ru.practicum.shareit.user.dto.UserDto;
+
 import java.util.List;
 
 public interface UserService {
@@ -14,5 +15,5 @@ public interface UserService {
 
     void deleteUser(int userId);
 
-    boolean isUserExists(int userId);
+    void checkUserId(int userId);
 }
