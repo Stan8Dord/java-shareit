@@ -54,16 +54,20 @@ public class ItemController {
     }
 
     @GetMapping
-    public List<ItemOwnerDto> getItems(@RequestHeader("X-Sharer-User-Id") int userId) {
+    public List<ItemOwnerDto> getItems(@RequestHeader("X-Sharer-User-Id") int userId,
+                                       @RequestParam(defaultValue = "0") int from,
+                                       @RequestParam(defaultValue = "32") int size) {
         log.info("GET: allItems by userId " + userId);
 
-        return itemService.getItems(userId);
+        return itemService.getItems(userId, from, size);
     }
 
     @GetMapping("/search")
-    public List<ItemDto> searchItems(@RequestHeader("X-Sharer-User-Id") int userId, @RequestParam String text) {
+    public List<ItemDto> searchItems(@RequestHeader("X-Sharer-User-Id") int userId, @RequestParam String text,
+                                     @RequestParam(defaultValue = "0") int from,
+                                     @RequestParam(defaultValue = "32") int size) {
         log.info("GET: search text " + text);
 
-        return text.equals("") ? new ArrayList<>() : itemService.searchItems(userId, text);
+        return text.equals("") ? new ArrayList<>() : itemService.searchItems(userId, text, from, size);
     }
 }

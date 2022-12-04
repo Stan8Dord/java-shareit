@@ -15,9 +15,9 @@ public interface ItemService {
 
     ItemOwnerDto getItemOwnerDtoById(int userId, long itemId);
 
-    List<ItemOwnerDto> getItems(int userId);
+    List<ItemOwnerDto> getItems(int userId, int from, int size);
 
-    List<ItemDto> searchItems(int userId, String text);
+    List<ItemDto> searchItems(int userId, String text, int from, int size);
 
     Boolean isItemAvailable(long itemId);
 

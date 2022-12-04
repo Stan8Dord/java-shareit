@@ -1,6 +1,10 @@
 package ru.practicum.shareit.item;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.booking.Booking;
 import ru.practicum.shareit.booking.BookingRepository;
@@ -96,10 +100,14 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public List<ItemOwnerDto> getItems(int userId) {
-        userService.checkUserId(userId);
+    public List<ItemOwnerDto> getItems(int userId, int fromElement, int size) {
         LocalDateTime now = LocalDateTime.now();
-        List<Item> items = itemRepository.findByOwnerOrderByIdDesc(userId);
+        userService.checkUserId(userId);
+        int from = fromElement >= 0 ? fromElement / size : fromElement;
+        Pageable page = PageRequest.of(from, size, Sort.by(Sort.Direction.DESC, "id"));
+        Page<Item> pageItems = itemRepository.findByOwner(userId, page);
+        List<Item> items = pageItems.stream().collect(Collectors.toList());
+
         List<ItemOwnerDto> itemDtoList = new ArrayList<>();
         for (int i = items.size() - 1; i >= 0; i--) {
             long itemId = items.get(i).getId();
@@ -118,10 +126,12 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public List<ItemDto> searchItems(int userId, String text) {
-        List<ItemDto> itemDtoList = itemRepository.findByTextOnlyAvailable(text);
+    public List<ItemDto> searchItems(int userId, String text, int fromElement, int size) {
+        int from = fromElement >= 0 ? fromElement / size : fromElement;
+        Pageable page = PageRequest.of(from, size, Sort.by(Sort.Direction.DESC, "id"));
+        Page<ItemDto> itemDtoList = itemRepository.findByTextOnlyAvailable(text, page);
 
-        return itemDtoList;
+        return itemDtoList.stream().collect(Collectors.toList());
     }
 
     private void checkItemId(long itemId) {

@@ -1,5 +1,7 @@
 package ru.practicum.shareit.booking;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -10,26 +12,26 @@ import java.util.List;
 
 @Repository
 public interface BookingRepository extends JpaRepository<Booking, Long>, BookingRepositoryCustom {
-    List<Booking> findByBookerOrderByStartDesc(int bookerId);
+    Page<Booking> findByBookerOrderByStartDesc(int bookerId, Pageable pageable);
 
-    List<Booking> findByBookerAndStatusOrderByStartDesc(int bookerId, BookingStatus status);
+    Page<Booking> findByBookerAndStatusOrderByStartDesc(int bookerId, BookingStatus status, Pageable pageable);
 
-    List<Booking> findByBookerAndEndBeforeOrderByStartDesc(int bookerId, LocalDateTime currentDateTime);
+    Page<Booking> findByBookerAndEndBeforeOrderByStartDesc(int bookerId, LocalDateTime currentDateTime, Pageable page);
 
-    List<Booking> findByBookerAndStartAfterOrderByStartDesc(int bookerId, LocalDateTime currentDateTime);
+    Page<Booking> findByBookerAndStartAfterOrderByStartDesc(int bookerId, LocalDateTime currentDateTime, Pageable page);
 
     @Query("select new ru.practicum.shareit.booking.Booking(b.id, b.start, b.end, b.item, b.booker, b.status) " +
             "from Booking as b " +
             "where b.booker = ?1 " +
             "and (?2 between b.start and b.end) " +
             "order by b.start desc")
-    List<Booking> findByBookerCurrentBookings(int bookerId, LocalDateTime currentDateTime);
+    Page<Booking> findByBookerCurrentBookings(int bookerId, LocalDateTime currentDateTime, Pageable pageable);
 
     @Query("select new ru.practicum.shareit.booking.Booking(b.id, b.start, b.end, b.item, b.booker, b.status) " +
             "from Booking as b inner join Item as it on b.item = it.id " +
             "where it.owner = ?1 " +
             "order by b.start desc")
-    List<Booking> getBookingsByUserItems(int userId);
+    Page<Booking> getBookingsByUserItems(int userId, Pageable pageable);
 
     //List<Booking> findByItemOrderByStartDateDesc(Long itemId);
 

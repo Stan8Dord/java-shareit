@@ -13,7 +13,8 @@ public class ItemMapper {
                 item.getId(),
                 item.getName(),
                 item.getDescription(),
-                item.getIsAvailable());
+                item.getIsAvailable(),
+                item.getRequest());
     }
 
     public Item toItem(int userId, ItemDto itemDto) {
@@ -22,7 +23,7 @@ public class ItemMapper {
                 itemDto.getDescription(),
                 itemDto.getAvailable(),
                 userId,
-                0);
+                itemDto.getRequestId());
     }
 
     public ItemOwnerDto toItemOwnerDto(Item item, BookingShort lastBooking,
