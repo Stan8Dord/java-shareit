@@ -85,7 +85,6 @@ public class BookingServiceImpl implements BookingService {
         switch (state) {
             case ALL:
                 bookings = bookingRepository.findByBookerOrderByStartDesc(userId, page);
-                System.out.println("Сработало ALL");
                 break;
             case REJECTED:
             case WAITING:
@@ -105,9 +104,7 @@ public class BookingServiceImpl implements BookingService {
                 break;
         }
 
-        System.out.println("pages: " + bookings.toString());
         List<BookingDto> dtos = bookings.stream().map(booking -> createBookingDto(userId, booking)).collect(Collectors.toList());
-        System.out.println("Dtos: " + dtos.toString());
 
         return dtos;
     }
