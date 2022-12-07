@@ -25,9 +25,6 @@ public class BookingController {
                                  @Valid @RequestBody BookingImportDto bookingDto) {
         log.info("POST: addBooking " + bookingDto);
 
-        System.out.println(bookingDto.toString());
-        System.out.println(bookingDto.getStart() + " старт");
-
         return bookingService.addBooking(userId, BookingImportDto.toBookingDto(bookingDto));
     }
 

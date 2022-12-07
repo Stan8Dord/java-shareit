@@ -27,11 +27,6 @@ public class IntegrationTests {
     private static User dummyUser2 = new User("user2", "email2@email.com");
     private static UserDto dummyDto = new UserDto(3, "newName", "newEmail@email.com");
 
-    @BeforeEach
-    public void beforeEach() {
-
-    }
-
     @Test
     @Order(1)
     void shouldGetAllUsers() {
@@ -55,5 +50,4 @@ public class IntegrationTests {
         assertThat(userDto.getEmail(), equalTo("newEmail@email.com"));
         assertThat(userDto.getName(), equalTo(("newName")));
     }
-
 }

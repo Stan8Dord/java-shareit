@@ -58,10 +58,11 @@ public class BookingServiceImpl implements BookingService {
         checkItemOwner(booking, ownerId);
         checkApproved(booking.getStatus());
 
-        if (approved)
+        if (Boolean.TRUE.equals(approved))
             booking.setStatus(BookingStatus.APPROVED);
         else
             booking.setStatus(BookingStatus.REJECTED);
+
         booking = bookingRepository.save(booking);
 
         return createBookingDto(booking.getBooker(), booking);
@@ -79,7 +80,7 @@ public class BookingServiceImpl implements BookingService {
     @Transactional(readOnly = true)
     public List<BookingDto> getAllUserBookings(int userId, BookingState state, int fromElement, int size) {
         userService.checkUserId(userId);
-        Page<Booking> bookings = null;
+        Page<Booking> bookings = Page.empty();
         int from = fromElement >= 0 ? fromElement / size : fromElement;
         Pageable page = PageRequest.of(from, size, Sort.by(Sort.Direction.DESC, "start"));
         switch (state) {
@@ -103,8 +104,10 @@ public class BookingServiceImpl implements BookingService {
                         .findByBookerAndStartAfterOrderByStartDesc(userId, LocalDateTime.now(), page);
                 break;
         }
-
-        List<BookingDto> dtos = bookings.stream().map(booking -> createBookingDto(userId, booking)).collect(Collectors.toList());
+        if (bookings == null)
+            bookings = Page.empty();
+        List<BookingDto> dtos = bookings.stream().map(booking -> createBookingDto(userId, booking))
+                .collect(Collectors.toList());
 
         return dtos;
     }

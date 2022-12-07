@@ -33,8 +33,6 @@ public interface BookingRepository extends JpaRepository<Booking, Long>, Booking
             "order by b.start desc")
     Page<Booking> getBookingsByUserItems(int userId, Pageable pageable);
 
-    //List<Booking> findByItemOrderByStartDateDesc(Long itemId);
-
     @Query("select new ru.practicum.shareit.booking.dto.BookingShort(b.id, b.booker) " +
             "from Booking as b " +
             "where b.item = ?1 " +
