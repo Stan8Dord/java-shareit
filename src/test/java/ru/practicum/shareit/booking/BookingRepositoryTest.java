@@ -28,7 +28,7 @@ public class BookingRepositoryTest {
     private UserRepository userRepository;
     @Autowired
     private ItemRepository itemRepository;
-    private final static LocalDateTime now = LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES);
+    private LocalDateTime now = LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES);
     private Booking dummyBooking = new Booking(now.plusDays(-1), now.plusDays(1), 1, 1, BookingStatus.APPROVED);
     private Booking dummyBooking1 = new Booking(now.plusDays(-3), now.plusDays(-2), 1, 1, BookingStatus.APPROVED);
     private Booking dummyBooking3 = new Booking(now.plusDays(2), now.plusDays(3), 1, 1, BookingStatus.APPROVED);

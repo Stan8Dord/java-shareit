@@ -117,7 +117,7 @@ public class BookingServiceImpl implements BookingService {
     public List<BookingDto> getAllUserStuffBookings(int ownerId, BookingState state, int fromElement, int size) {
         userService.checkUserId(ownerId);
         int from = fromElement >= 0 ? fromElement / size : fromElement;
-        List<Booking> bookings = bookingRepository.getBookingsByUserItemsWithState(ownerId, state, from , size);
+        List<Booking> bookings = bookingRepository.getBookingsByUserItemsWithState(ownerId, state, from, size);
         return bookings.stream().map(booking -> createBookingDto(booking.getBooker(), booking))
                 .collect(Collectors.toList());
     }
