@@ -35,7 +35,7 @@ public class IntegrationTests {
     private User dummyUser1 = new User("user1", "email1@email.com");
     private User dummyUser2 = new User("user2", "email2@email.com");
     private UserDto dummyDto = new UserDto(3, "newName", "newEmail@email.com");
-    private Item dummyItem1 = new Item( "name1", "description1", true, 4, 1);
+    private Item dummyItem1 = new Item("name1", "description1", true, 4, 1);
     private Booking dummyBooking1 = new Booking(now.plusDays(-3), now.plusDays(-2), 1, 4, BookingStatus.APPROVED);
 
     @Test
