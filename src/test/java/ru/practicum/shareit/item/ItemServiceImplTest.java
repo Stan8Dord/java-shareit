@@ -1,6 +1,7 @@
 package ru.practicum.shareit.item;
 
 import lombok.RequiredArgsConstructor;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -9,7 +10,9 @@ import org.mockito.MockitoSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
+import ru.practicum.shareit.booking.Booking;
 import ru.practicum.shareit.booking.BookingRepository;
+import ru.practicum.shareit.booking.BookingStatus;
 import ru.practicum.shareit.exceptions.NotFoundException;
 import ru.practicum.shareit.exceptions.ValidationException;
 import ru.practicum.shareit.item.dto.CommentDto;
@@ -19,11 +22,14 @@ import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.UserService;
 
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.anyInt;
 
 @Transactional
 @SpringBootTest(
@@ -42,6 +48,11 @@ public class ItemServiceImplTest {
     private static Item dummyItem1 = new Item(1, "name1", "description1", true, 1, 1);
     private static Item dummyItem2 = new Item(2, "name2", "description2", true, 1, 2);
     private static ItemDto dummyDto = new ItemDto(1, "name", "description", true, 1);
+    private static final LocalDateTime now = LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS);
+    private static Booking dummyBooking = new Booking(1, now.plusHours(-10), now.plusHours(-8), 1, 1,
+            BookingStatus.WAITING);
+    private static CommentDto dto = new CommentDto(1L, "comment1", "author", now);
+    private static Comment comment = new Comment(1L, "comment1", 1L, 1, now);
 
     @BeforeEach
     void startSession() {
@@ -95,9 +106,28 @@ public class ItemServiceImplTest {
 
     @Test
     void shouldFailCommentator() {
-        CommentDto dto = new CommentDto(1, "comment1", "author", LocalDateTime.now());
+        CommentDto dto = new CommentDto(1L, "comment1", "author", LocalDateTime.now());
 
         Exception exception = assertThrows(ValidationException.class,
                 () -> itemService.addNewComment(1, 99, dto));
+    }
+
+    @Test
+    void shouldAddNewComment() {
+        Mockito.when(commentRepository.save(Mockito.any())).thenReturn(comment);
+        Mockito.when(bookingRepository.findByBookerAndItem(anyInt(), Mockito.anyLong()))
+                .thenReturn(List.of(dummyBooking));
+        Mockito.when(commentRepository.getUserName(anyInt())).thenReturn(List.of("author"));
+
+        CommentDto resultDto = itemService.addNewComment(1, 1L, dto);
+
+        assertEquals("comment1", resultDto.getText());
+        assertEquals("author", resultDto.getAuthorName());
+        assertEquals(now, resultDto.getCreated());
+        assertEquals(1, resultDto.getId());
+
+        Mockito.verify(commentRepository).save(Mockito.any());
+        Mockito.verify(commentRepository).getUserName(anyInt());
+        Mockito.verifyNoMoreInteractions(commentRepository);
     }
 }
