@@ -8,6 +8,7 @@ import org.mockito.Mockito;
 import org.mockito.MockitoSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.*;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.exceptions.NotFoundException;
 import ru.practicum.shareit.exceptions.ValidationException;
@@ -17,9 +18,12 @@ import ru.practicum.shareit.requests.dto.ItemRequestDto;
 import ru.practicum.shareit.user.UserService;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyLong;
 
 @Transactional
 @SpringBootTest(
@@ -73,5 +77,25 @@ public class RequestServiceImplTest {
 
         Exception exception = assertThrows(NotFoundException.class,
                 () -> requestService.getRequestById(1, 1L));
+    }
+
+    @Test
+    void shouldGetRequestById() {
+        Mockito.when(requestRepository.findById(1L)).thenReturn(Optional.of(dummyItem));
+        requestService.getRequestById(1, 1L);
+
+        Mockito.verify(itemRepository).findAllByRequestOrderByIdDesc(anyLong());
+    }
+
+    @Test
+    void shouldGetAllRequests() {
+        Pageable page = PageRequest.of(0, 5, Sort.by(Sort.Direction.DESC, "created"));
+        Page<ItemRequest> requests = new PageImpl<>(List.of(dummyItem));
+        Mockito.when(requestRepository.findAll(page)).thenReturn(requests);
+
+        requestService.getAllRequests(2, 0, 5);
+
+        Mockito.verify(requestRepository).findAll(page);
+        Mockito.verify(itemRepository).findAllByRequestOrderByIdDesc(anyLong());
     }
 }

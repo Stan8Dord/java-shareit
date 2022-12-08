@@ -85,6 +85,7 @@ public class ItemServiceImpl implements ItemService {
         LocalDateTime now = LocalDateTime.now();
         BookingShort nextBooking = null;
         BookingShort lastBooking = null;
+
         if (isItemOwner(itemId, userId)) {
             nextBooking = bookingRepository
                     .getBookingShortFutureByItem(itemId, now).stream().findFirst().orElse(null);

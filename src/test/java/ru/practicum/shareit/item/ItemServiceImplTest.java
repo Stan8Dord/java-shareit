@@ -8,6 +8,7 @@ import org.mockito.Mockito;
 import org.mockito.MockitoSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.*;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.Booking;
 import ru.practicum.shareit.booking.BookingRepository;
@@ -29,6 +30,7 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyLong;
 
 @Transactional
 @SpringBootTest(
@@ -114,7 +116,7 @@ public class ItemServiceImplTest {
     @Test
     void shouldAddNewComment() {
         Mockito.when(commentRepository.save(Mockito.any())).thenReturn(comment);
-        Mockito.when(bookingRepository.findByBookerAndItem(anyInt(), Mockito.anyLong()))
+        Mockito.when(bookingRepository.findByBookerAndItem(anyInt(), anyLong()))
                 .thenReturn(List.of(dummyBooking));
         Mockito.when(commentRepository.getUserName(anyInt())).thenReturn(List.of("author"));
 
@@ -128,5 +130,30 @@ public class ItemServiceImplTest {
         Mockito.verify(commentRepository).save(Mockito.any());
         Mockito.verify(commentRepository).getUserName(anyInt());
         Mockito.verifyNoMoreInteractions(commentRepository);
+    }
+
+    @Test
+    void shouldGetItemOwnerDtoById() {
+        Mockito.when(itemRepository.findAll()).thenReturn(List.of(dummyItem1));
+        Mockito.when(itemRepository.findById(anyLong())).thenReturn(Optional.of(dummyItem1));
+        Mockito.when(commentRepository.findAllByItem(anyLong())).thenReturn(List.of(comment));
+        Mockito.when(commentRepository.getUserName(anyInt())).thenReturn(List.of("user"));
+
+        itemService.getItemOwnerDtoById(1, 1L);
+
+        Mockito.verify(itemRepository, Mockito.times(2)).findById(Mockito.any());
+        Mockito.verify(commentRepository).findAllByItem(anyLong());
+        Mockito.verify(commentRepository).getUserName(anyInt());
+    }
+
+    @Test
+    void shouldGetItems() {
+        Pageable page = PageRequest.of(0, 3, Sort.by(Sort.Direction.DESC, "id"));
+        Page<Item> items = new PageImpl<>(List.of(dummyItem1));
+        Mockito.when(itemRepository.findByOwner(1, page)).thenReturn(items);
+
+        itemService.getItems(1, 0, 3);
+
+        Mockito.verify(itemRepository, Mockito.times(1)).findByOwner(anyInt(), Mockito.any());
     }
 }
