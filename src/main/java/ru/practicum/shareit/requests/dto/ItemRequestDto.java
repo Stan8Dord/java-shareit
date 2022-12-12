@@ -2,15 +2,18 @@ package ru.practicum.shareit.requests.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import ru.practicum.shareit.user.model.User;
+import ru.practicum.shareit.item.dto.ItemDto;
 
-import java.time.Instant;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Data
 @AllArgsConstructor
 public class ItemRequestDto {
     private long id;
     private String description;
-    private User requester;
-    private Instant created;
+    private int requester;
+    private LocalDateTime created;
+    private List<ItemDto> items = new ArrayList<>();
 }

@@ -1,6 +1,10 @@
 package ru.practicum.shareit.booking;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.dto.BookingDto;
@@ -54,10 +58,11 @@ public class BookingServiceImpl implements BookingService {
         checkItemOwner(booking, ownerId);
         checkApproved(booking.getStatus());
 
-        if (approved)
+        if (Boolean.TRUE.equals(approved))
             booking.setStatus(BookingStatus.APPROVED);
         else
             booking.setStatus(BookingStatus.REJECTED);
+
         booking = bookingRepository.save(booking);
 
         return createBookingDto(booking.getBooker(), booking);
@@ -73,37 +78,46 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<BookingDto> getAllUserBookings(int userId, BookingState state) {
+    public List<BookingDto> getAllUserBookings(int userId, BookingState state, int fromElement, int size) {
         userService.checkUserId(userId);
-        List<Booking> bookings = null;
+        Page<Booking> bookings = Page.empty();
+        int from = fromElement >= 0 ? fromElement / size : fromElement;
+        Pageable page = PageRequest.of(from, size, Sort.by(Sort.Direction.DESC, "start"));
         switch (state) {
             case ALL:
-                bookings = bookingRepository.findByBookerOrderByStartDesc(userId);
+                bookings = bookingRepository.findByBookerOrderByStartDesc(userId, page);
                 break;
             case REJECTED:
             case WAITING:
                 bookings = bookingRepository.findByBookerAndStatusOrderByStartDesc(userId,
-                        BookingStatus.valueOf(state.toString()));
+                        BookingStatus.valueOf(state.toString()), page);
                 break;
             case PAST:
-                bookings = bookingRepository.findByBookerAndEndBeforeOrderByStartDesc(userId, LocalDateTime.now());
+                bookings = bookingRepository
+                        .findByBookerAndEndBeforeOrderByStartDesc(userId, LocalDateTime.now(), page);
                 break;
             case CURRENT:
-                bookings =  bookingRepository.findByBookerCurrentBookings(userId, LocalDateTime.now());
+                bookings =  bookingRepository.findByBookerCurrentBookings(userId, LocalDateTime.now(), page);
                 break;
             case FUTURE:
-                bookings = bookingRepository.findByBookerAndStartAfterOrderByStartDesc(userId, LocalDateTime.now());
+                bookings = bookingRepository
+                        .findByBookerAndStartAfterOrderByStartDesc(userId, LocalDateTime.now(), page);
                 break;
         }
+        if (bookings == null)
+            bookings = Page.empty();
+        List<BookingDto> dtos = bookings.stream().map(booking -> createBookingDto(userId, booking))
+                .collect(Collectors.toList());
 
-        return bookings.stream().map(booking -> createBookingDto(userId, booking)).collect(Collectors.toList());
+        return dtos;
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<BookingDto> getAllUserStuffBookings(int ownerId, BookingState state) {
+    public List<BookingDto> getAllUserStuffBookings(int ownerId, BookingState state, int fromElement, int size) {
         userService.checkUserId(ownerId);
-        List<Booking> bookings = bookingRepository.getBookingsByUserItemsWithState(ownerId, state);
+        int from = fromElement >= 0 ? fromElement / size : fromElement;
+        List<Booking> bookings = bookingRepository.getBookingsByUserItemsWithState(ownerId, state, from, size);
         return bookings.stream().map(booking -> createBookingDto(booking.getBooker(), booking))
                 .collect(Collectors.toList());
     }

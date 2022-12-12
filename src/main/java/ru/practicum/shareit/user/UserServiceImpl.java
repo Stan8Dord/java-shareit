@@ -41,7 +41,6 @@ public class UserServiceImpl implements UserService {
             String email = userDto.getEmail();
             if (email != null)
                 user.setEmail(email);
-
             return UserMapper.toUserDto(userRepository.save(user));
         } else {
             throw new NotFoundException("Нет такого пользователя!");

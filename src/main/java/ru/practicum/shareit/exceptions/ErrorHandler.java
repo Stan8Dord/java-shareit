@@ -23,12 +23,6 @@ public class ErrorHandler {
     }
 
     @ExceptionHandler
-    @ResponseStatus(HttpStatus.CONFLICT)
-    public String handleConflict(final ConflictException e) {
-        return e.getMessage();
-    }
-
-    @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse handleEnumRequestErrors(final ConversionFailedException e) {
         return new ErrorResponse("Unknown state: UNSUPPORTED_STATUS", e.getMessage());
