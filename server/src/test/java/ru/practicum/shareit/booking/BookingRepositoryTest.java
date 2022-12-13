@@ -31,7 +31,8 @@ public class BookingRepositoryTest {
     private LocalDateTime now = LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES);
     private Booking dummyBooking = new Booking(now.plusDays(-1), now.plusDays(1), 1, 1, BookingStatus.APPROVED);
     private Booking dummyBooking1 = new Booking(now.plusDays(-3), now.plusDays(-2), 1, 1, BookingStatus.APPROVED);
-    private Booking dummyBooking3 = new Booking(now.plusDays(2), now.plusDays(3), 1, 1, BookingStatus.APPROVED);
+    private Booking dummyBooking2 = new Booking(now.plusDays(-4), now.plusDays(-3), 1, 1, BookingStatus.REJECTED);
+    private Booking dummyBooking3 = new Booking(now.plusDays(2), now.plusDays(3), 1, 1, BookingStatus.WAITING);
     private User dummyUser1 = new User(1, "user1", "email1@email.com");
     private Item dummyItem1 = new Item(1, "name1", "description1", true, 1, 1);
     private Pageable page = PageRequest.of(0, 1, Sort.by(Sort.Direction.DESC, "start"));
@@ -103,5 +104,67 @@ public class BookingRepositoryTest {
         Assertions.assertEquals(dummyBooking3.getItem(), booking.getItem());
         Assertions.assertEquals(dummyBooking3.getStart(), booking.getStart());
         Assertions.assertEquals(dummyBooking3.getStatus(), booking.getStatus());
+    }
+
+    @Test
+    void getBookingsByUserItemsWithStatePastTest() {
+        List<Booking> bookings = bookingRepository.getBookingsByUserItemsWithState(1, BookingState.PAST, 0, 5);
+
+        Optional<Booking> bookingOptional = bookings.stream().findFirst();
+        System.out.println("size = " + bookings.size());
+        Assertions.assertTrue(bookingOptional.isPresent());
+        Booking booking = bookingOptional.get();
+        Assertions.assertEquals(dummyBooking1.getBooker(), booking.getBooker());
+        Assertions.assertEquals(dummyBooking1.getItem(), booking.getItem());
+        Assertions.assertEquals(dummyBooking1.getStart(), booking.getStart());
+        Assertions.assertEquals(dummyBooking1.getStatus(), booking.getStatus());
+    }
+
+    @Test
+    void getBookingsByUserItemsWithStateCurrentTest() {
+        List<Booking> bookings = bookingRepository.getBookingsByUserItemsWithState(1, BookingState.CURRENT, 0, 5);
+
+        Optional<Booking> bookingOptional = bookings.stream().findFirst();
+        System.out.println("size = " + bookings.size());
+        Assertions.assertTrue(bookingOptional.isPresent());
+        Booking booking = bookingOptional.get();
+        Assertions.assertEquals(dummyBooking.getBooker(), booking.getBooker());
+        Assertions.assertEquals(dummyBooking.getItem(), booking.getItem());
+        Assertions.assertEquals(dummyBooking.getStart(), booking.getStart());
+        Assertions.assertEquals(dummyBooking.getStatus(), booking.getStatus());
+    }
+
+    @Test
+    void getBookingsByUserItemsWithStateWaitingTest() {
+        List<Booking> bookings = bookingRepository.getBookingsByUserItemsWithState(1, BookingState.WAITING, 0, 5);
+
+        Optional<Booking> bookingOptional = bookings.stream().findFirst();
+        Assertions.assertTrue(bookingOptional.isPresent());
+        Booking booking = bookingOptional.get();
+        Assertions.assertEquals(dummyBooking3.getBooker(), booking.getBooker());
+        Assertions.assertEquals(dummyBooking3.getItem(), booking.getItem());
+        Assertions.assertEquals(dummyBooking3.getStart(), booking.getStart());
+        Assertions.assertEquals(dummyBooking3.getStatus(), booking.getStatus());
+    }
+
+    @Test
+    void getBookingsByUserItemsWithStateRejectedTest() {
+        bookingRepository.save(dummyBooking2);
+        List<Booking> bookings = bookingRepository.getBookingsByUserItemsWithState(1, BookingState.REJECTED, 0, 5);
+
+        Optional<Booking> bookingOptional = bookings.stream().findFirst();
+        Assertions.assertTrue(bookingOptional.isPresent());
+        Booking booking = bookingOptional.get();
+        Assertions.assertEquals(dummyBooking2.getBooker(), booking.getBooker());
+        Assertions.assertEquals(dummyBooking2.getItem(), booking.getItem());
+        Assertions.assertEquals(dummyBooking2.getStart(), booking.getStart());
+        Assertions.assertEquals(dummyBooking2.getStatus(), booking.getStatus());
+    }
+
+    @Test
+    void getBookingsByUserItemsWithStateAllTest() {
+        List<Booking> bookings = bookingRepository.getBookingsByUserItemsWithState(1, BookingState.ALL, 0, 5);
+
+        Assertions.assertEquals(bookings.size(), 3);
     }
 }
