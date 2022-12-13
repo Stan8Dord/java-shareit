@@ -1,6 +1,7 @@
 package ru.practicum.shareit.exception;
 
 import lombok.Getter;
+import org.springframework.core.convert.ConversionFailedException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
