@@ -42,6 +42,7 @@ public class UserController {
 
     @GetMapping
     public List<UserDto> getAllUsers() {
+        System.out.println("No, it's not work(");
         return service.getAllUsers();
     }
 
